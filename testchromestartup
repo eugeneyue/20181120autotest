@@ -1,23 +1,21 @@
 from selenium import webdriver
-import time
+from selenium.webdriver.support.select import Select
+import time,random
+
+def randomchoice():
+    temp = random.uniform(0,4)
+    return temp
 
 qd = webdriver.Chrome()
-qd.get("http://www.gllue.com/home/product-hr")              # 进入谷露申请试用界面
+qd.get("http://www.gllue.com/home/product-hr")                          # 进入谷露申请试用界面
 time.sleep(2)
 
-#---------------不同定位测试start-----------------#
-
-#绝对路径定位参考：
-#find_element_by_xpath("/html/body/div[1]/div[1]/div/div[1]/div/form/span[1]/input")
-
-#qd.find_element_by_link_text("申请试用").click()           # 通过link text定位申请使用按钮（错误的方式）
-#qd.find_element_by_xpath("//input[@value='申请试用']")     # 相对路径定位（执行不成功）
-#qd.find_element_by_css_selector()                         # 通过CSS定位
-
-#---------------不同定位测试end-----------------#
-
-qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()  #通过xpath来定位按钮
+#定位申请试用按钮
+#qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                      #通过xpath来定位申请试用按钮
+qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()  #通过CSS来定位申请试用按钮
 time.sleep(1)
+
+#自动填写表单
 qd.find_element_by_id("company").send_keys("autotest")                  # 定位输入框并输入关键字
 qd.find_element_by_id("chineseName").send_keys("autotest")
 qd.find_element_by_id("title").send_keys("autotest")
@@ -25,10 +23,13 @@ qd.find_element_by_id("location").send_keys("autotest")
 qd.find_element_by_id("mobile").send_keys("18118393383")
 qd.find_element_by_id("email").send_keys("eugene.yue@gllue.com")
 
-qd.find_element_by_xpath("//*[@id='scale']/option[2]").click()          #如何自动选择/随机选择下拉框的value？
-qd.find_element_by_xpath("//*[@id='source']/option[3]").click()
+#关于选择下拉框
+#qd.find_element_by_xpath("//*[@id='source']/option[3]").click()         #固定选择一个下拉值
+tempchoice = int(randomchoice())
+dropdownselection = qd.find_element_by_xpath("//*[@id='scale']")         #随机选择下拉框的value
+Select(dropdownselection).select_by_index(tempchoice)
 
-qd.find_element_by_id("message").send_keys("just for autotest")
+qd.find_element_by_id("message").send_keys("自动测试申请试用")
 
 #time.sleep(2)   #等待3秒
 #qd.quit()   #关闭浏览器
