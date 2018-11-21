@@ -1,9 +1,25 @@
 from selenium import webdriver
 import time
 
-wd = webdriver.Chrome()
-wd.get("https://www.baidu.com")    # 打开浏览器并输入百度
-wd.find_element_by_id("kw").send_keys("selenium")   # 定位输入框并输入关键字
-wd.find_element_by_id("su").click()   #点击[百度一下]搜索
+#wd = webdriver.Chrome()
+#wd.get("https://www.baidu.com")    # 打开浏览器并输入百度
+#wd.find_element_by_id("kw").send_keys("selenium")   # 定位输入框并输入关键字
+#wd.find_element_by_id("su").click()   #点击[百度一下]搜索
+#time.sleep(3)   #等待3秒
+#wd.quit()   #关闭浏览器
+
+qd = webdriver.Chrome()
+qd.get("http://www.gllue.com/home/product-hr")    # 进入谷露申请试用界面
+qd.find_element_by_link_text("申请试用").click()   # 通过link text定位申请使用按钮
+time.sleep(1)
+qd.find_element_by_id("company").send_keys("autotest")   # 定位输入框并输入关键字
+qd.find_element_by_id("chineseName").send_keys("autotest")
+qd.find_element_by_id("title").send_keys("autotest")
+qd.find_element_by_id("location").send_keys("autotest")
+qd.find_element_by_id("mobile").send_keys("18118393383")
+qd.find_element_by_id("email").send_keys("eugene.yue@gllue.com")
+#qd.find_element_by_id("scale").send_keys("selenium")    #如何自动选择/随机选择下拉框的value？
+#qd.find_element_by_id("source").send_keys("selenium")
+qd.find_element_by_id("message").send_keys("just for autotest")
 time.sleep(3)   #等待3秒
-wd.quit()   #关闭浏览器
+qd.quit()   #关闭浏览器
