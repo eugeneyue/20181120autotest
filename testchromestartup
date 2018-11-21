@@ -6,6 +6,8 @@ def randomchoice():
     temp = random.uniform(0,4)
     return temp
 
+current_time = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(time.time()))
+
 qd = webdriver.Chrome()
 qd.get("http://www.gllue.com/home/product-hr")                          # 进入谷露申请试用界面
 time.sleep(2)
@@ -30,6 +32,9 @@ dropdownselection = qd.find_element_by_xpath("//*[@id='scale']")         #随机
 Select(dropdownselection).select_by_index(tempchoice)
 
 qd.find_element_by_id("message").send_keys("自动测试申请试用")
+
+#点击提交之后自动截图
+qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')
 
 #time.sleep(2)   #等待3秒
 #qd.quit()   #关闭浏览器
