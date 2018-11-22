@@ -77,6 +77,9 @@ Select(dropdownselection).select_by_index(tempchoice)
 
 qd.find_element_by_id("message").send_keys("自动测试申请试用")
 
+#qd.find_element_by_css_selector("#request > input.button").click()                             # 通过CSS定位申请试用按钮
+#qd.find_element_by_xpath("//*[@id='request']/input[7]").click()                                # 通过xpath定位申请试用按钮
+
 # 点击提交之后自动截图
 time.sleep(1)
 current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
