@@ -6,7 +6,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 import tkinter.messagebox
-import time,random,smtplib
+import time,random,smtplib,datetime
 
 def randomchoice():                                     # 随机生成数字用于随机选中下拉框内容
     temp = random.uniform(0,4)
@@ -50,6 +50,8 @@ def sendresultemail(body='test',current_time='1995-07-20_00_00_00'):            
     except smtplib.SMTPException as e:
         tkinter.messagebox.showinfo("邮件发送失败", "Errorinfo: %s" % e)
 
+starttime = datetime.datetime.now()                                                          # 记录开始时间
+
 qd = webdriver.Chrome()
 qd.get("http://www.gllue.com/home/product-hr")                                                # 进入谷露申请试用界面
 time.sleep(2)
@@ -77,15 +79,19 @@ qd.find_element_by_id("message").send_keys("自动测试申请试用")
 
 # 点击提交之后自动截图
 time.sleep(1)
-current_time = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(time.time()))
-qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')  # 自动保存至桌面文件夹
+current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')            # 自动保存至桌面文件夹
 qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')  # 自动保存至代码文件夹
+
+endtime = datetime.datetime.now()                                                                      # 记录结束时间
+duration = (endtime - starttime)
+print("脚本运行时长：" + str(duration))
 
 emailcontent = """
 <div><span style="font-size:18pt;"><strong>Test Report of Leads</strong></span></div>
 <div>&nbsp;</div>
-<div><strong>Start Time:&nbsp;</strong></div>
-<div><strong>Duration:&nbsp;</strong></div>
+<div><strong>Start Time:&nbsp;</strong>""" + str(current_time) + """</div>
+<div><strong>Duration:&nbsp;</strong>""" + str(duration) + """</div>
 <div><strong>Status:&nbsp;</strong></div>
 <div>&nbsp;</div>
 <div>
