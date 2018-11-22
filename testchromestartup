@@ -1,31 +1,51 @@
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
 from email.mime.text import MIMEText
-from email.header import Header
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.application import MIMEApplication
+from email import encoders
+from datetime import datetime
 
-import time,random,smtplib
+import tkinter.messagebox
+import time,random,smtplib,email
 
 def randomchoice():
     temp = random.uniform(0,4)
     return temp
 
-def resultemail():
+def sendresultemail(body):                   # 整合了发送邮件 + 截图
     sender = 'eugene.yue@gllue.com'                     # 发送邮箱
     receiver = 'eugeneyueyujiang@163.com'               # 接收邮箱
     subject = '申请试用-自动化提交结果截图'                 # 发送邮件主题
-    smtpserver = 'smtphm.qiye.163.com'                  # 发送邮箱服务器
+
     username = 'eugene.yue@gllue.com'                   # 发送邮箱用户/密码
     password = 'Yyj19941224?'
-    msg = MIMEText('你好!', 'plain', 'utf-8')
-    msg['Subject'] = Header(subject, 'utf-8')
-    msg['From'] = 'eugene.yue@gllue.com'
-    msg['To'] = 'eugeneyueyujiang@163.com'
-    #msg.attach()                                       #在此附上附件？自动生成报告？
-    smtp = smtplib.SMTP()
-    smtp.connect('smtphm.qiye.163.com')
-    smtp.login(username, password)
-    smtp.sendmail(sender, receiver, msg.as_string())
-    smtp.quit()
+
+    msg = MIMEMultipart()                               # 构造一个MIMEMultipart对象代表邮件本身
+    msg['From'] = sender
+    msg['To'] = receiver
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+
+    with open('/Users/eugene/Autotest/20181120/Autoscreenshot/2018-11-22-15_54_05.png', 'rb') as f:
+        mime = MIMEBase('image', 'png', filename='2018-11-22-15_54_05.png')                              # MIMEBase表示附件的对象
+        mime.add_header('Content-Disposition', 'attachment', filename='2018-11-22-15_54_05.png')        # filename是显示附件名字
+        mime.add_header('Content-ID', '<0>')
+        mime.add_header('X-Attachment-Id', '0')
+        mime.set_payload(f.read())                                                       # 获取附件内容
+        encoders.encode_base64(mime)
+        msg.attach(mime)                                                                 # 作为附件添加到邮件
+
+    try:
+        smtp = smtplib.SMTP()                           #邮件服务器
+        smtp.connect('smtphm.qiye.163.com')
+        smtp.login(username, password)
+        smtp.sendmail(sender, receiver, msg.as_string())
+        smtp.quit()
+    except smtplib.SMTPException as e:
+        tkinter.messagebox.showinfo("邮件发送失败", "Errorinfo: %s" % e)
 
 current_time = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(time.time()))
 
@@ -59,7 +79,13 @@ time.sleep(1)
 qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')                #自动保存至桌面文件夹
 qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')       #自动保存至代码文件夹
 
-resultemail()
+time_now = str(datetime.now())
+pic_name = qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')
+
+sendresultemail('提交结果截图请见附件')
+
+#if __name__ == "__main__":
+#    sendresultemail('附件是测试提交的截图, 请查收!')
 
 #time.sleep(2)   #等待3秒
 #qd.quit()   #关闭浏览器
