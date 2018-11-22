@@ -12,20 +12,20 @@ def randomchoice():                                     # 随机生成数字用�
     temp = random.uniform(0,4)
     return temp
 
-def sendresultemail(body,current_time):                 # 整合了发送邮件
-    sender = 'eugene.yue@gllue.com'                     # 发送邮箱
-    receiver = 'eugeneyueyujiang@163.com'               # 接收邮箱
-    subject = '申请试用-自动化提交结果截图'                 # 发送邮件主题
+def sendresultemail(body='test',current_time='1995-07-20_00_00_00'):                 # 整合了发送邮件
+    sender = 'eugene.yue@gllue.com'                                                  # 发送邮箱
+    receiver = 'eugeneyueyujiang@163.com'                                            # 接收邮箱
+    subject = '申请试用-自动化提交结果截图'                                              # 发送邮件主题
 
-    username = 'eugene.yue@gllue.com'                   # 发送邮箱用户/密码
+    username = 'eugene.yue@gllue.com'                                                # 发送邮箱用户/密码
     password = 'Yyj19941224?'
 
-    msg = MIMEMultipart()                               # 构造一个MIMEMultipart对象代表邮件本身
+    msg = MIMEMultipart()                                                            # 构造一个MIMEMultipart对象代表邮件本身
     msg['From'] = sender
     msg['To'] = receiver
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(body, 'plain', 'utf-8'))
+    msg.attach(MIMEText(body, 'html', 'utf-8'))
 
     pngname = current_time + '.png'                                                        # 确认截图文件名称
 
@@ -81,9 +81,39 @@ current_time = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(time.time()))
 qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')  # 自动保存至桌面文件夹
 qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')  # 自动保存至代码文件夹
 
-#sendresultemail('提交结果截图请见附件',current_time)
-if __name__ == "__main__":
-    sendresultemail('提交结果截图请见附件',current_time)
+emailcontent = """
+<div><span style="font-size:18pt;"><strong>Test Report of Leads</strong></span></div>
+<div>&nbsp;</div>
+<div><strong>Start Time:&nbsp;</strong></div>
+<div><strong>Duration:&nbsp;</strong></div>
+<div><strong>Status:&nbsp;</strong></div>
+<div>&nbsp;</div>
+<div>
+<table border="1" cellpadding="1" cellspacing="1" style="width:500px;">
+	<tbody align="center" valign="center">
+		<tr>
+			<td><strong>Test Group/Test Case</strong></td>
+			<td><strong>Count</strong></td>
+			<td><strong>Pass</strong></td>
+			<td><strong>Fail</strong></td>
+			<td><strong>Error</strong></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+	</tbody>
+</table>
+<div>&nbsp;</div>
+<div><em>Generate by auto-testing and please do not reply. -- Eugene</em></div>
+</div>
+"""
+
+if __name__ == "__main__":                                                          # 发送测试结果邮件
+    sendresultemail(emailcontent,current_time)
 
 time.sleep(3)   #等待2秒
 qd.quit()   #关闭浏览器
