@@ -3,18 +3,16 @@ from selenium.webdriver.support.select import Select
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
-from email.mime.application import MIMEApplication
 from email import encoders
-from datetime import datetime
 
 import tkinter.messagebox
-import time,random,smtplib,email
+import time,random,smtplib
 
-def randomchoice():
+def randomchoice():                                     # 随机生成数字用于随机选中下拉框内容
     temp = random.uniform(0,4)
     return temp
 
-def sendresultemail(body):                   # 整合了发送邮件 + 截图
+def sendresultemail(body,current_time):                 # 整合了发送邮件
     sender = 'eugene.yue@gllue.com'                     # 发送邮箱
     receiver = 'eugeneyueyujiang@163.com'               # 接收邮箱
     subject = '申请试用-自动化提交结果截图'                 # 发送邮件主题
@@ -29,17 +27,22 @@ def sendresultemail(body):                   # 整合了发送邮件 + 截图
 
     msg.attach(MIMEText(body, 'plain', 'utf-8'))
 
-    with open('/Users/eugene/Autotest/20181120/Autoscreenshot/2018-11-22-15_54_05.png', 'rb') as f:
-        mime = MIMEBase('image', 'png', filename='2018-11-22-15_54_05.png')                              # MIMEBase表示附件的对象
-        mime.add_header('Content-Disposition', 'attachment', filename='2018-11-22-15_54_05.png')        # filename是显示附件名字
+    pngname = current_time + '.png'                                                        # 确认截图文件名称
+
+    #pngpath = '//Users/eugene/desktop/autoscreenshot/' + pngname                          # 根据文件名定位（本地）
+    pngpath = '//Users/eugene/Autotest/20181120/Autoscreenshot/' + pngname                 # 根据文件名定位（代码文件中）
+
+    with open(pngpath, 'rb') as f:
+        mime = MIMEBase('image', 'png', filename = pngname)                                 # MIMEBase表示附件的对象
+        mime.add_header('Content-Disposition', 'attachment', filename = pngname)            # filename是显示附件名字
         mime.add_header('Content-ID', '<0>')
         mime.add_header('X-Attachment-Id', '0')
-        mime.set_payload(f.read())                                                       # 获取附件内容
+        mime.set_payload(f.read())                                                          # 获取附件内容
         encoders.encode_base64(mime)
-        msg.attach(mime)                                                                 # 作为附件添加到邮件
+        msg.attach(mime)                                                                    # 作为附件添加到邮件
 
     try:
-        smtp = smtplib.SMTP()                           #邮件服务器
+        smtp = smtplib.SMTP()                                                               # 邮件服务器
         smtp.connect('smtphm.qiye.163.com')
         smtp.login(username, password)
         smtp.sendmail(sender, receiver, msg.as_string())
@@ -47,19 +50,17 @@ def sendresultemail(body):                   # 整合了发送邮件 + 截图
     except smtplib.SMTPException as e:
         tkinter.messagebox.showinfo("邮件发送失败", "Errorinfo: %s" % e)
 
-current_time = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(time.time()))
-
 qd = webdriver.Chrome()
-qd.get("http://www.gllue.com/home/product-hr")                          # 进入谷露申请试用界面
+qd.get("http://www.gllue.com/home/product-hr")                                                # 进入谷露申请试用界面
 time.sleep(2)
 
 #定位申请试用按钮
-#qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                      #通过xpath来定位申请试用按钮
-qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()  #通过CSS来定位申请试用按钮
+#qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                      # 通过xpath来定位申请试用按钮
+qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()  # 通过CSS来定位申请试用按钮
 time.sleep(1)
 
 #自动填写表单
-qd.find_element_by_id("company").send_keys("autotest")                  # 定位输入框并输入关键字
+qd.find_element_by_id("company").send_keys("autotest")                                         # 定位输入框并输入关键字
 qd.find_element_by_id("chineseName").send_keys("autotest")
 qd.find_element_by_id("title").send_keys("autotest")
 qd.find_element_by_id("location").send_keys("autotest")
@@ -67,25 +68,22 @@ qd.find_element_by_id("mobile").send_keys("18118393383")
 qd.find_element_by_id("email").send_keys("eugene.yue@gllue.com")
 
 #关于选择下拉框
-#qd.find_element_by_xpath("//*[@id='source']/option[3]").click()         #固定选择一个下拉值
+#qd.find_element_by_xpath("//*[@id='source']/option[3]").click()                               # 固定选择一个下拉值
 tempchoice = int(randomchoice())
-dropdownselection = qd.find_element_by_xpath("//*[@id='scale']")         #随机选择下拉框的value
+dropdownselection = qd.find_element_by_xpath("//*[@id='scale']")                               # 随机选择下拉框的value
 Select(dropdownselection).select_by_index(tempchoice)
 
 qd.find_element_by_id("message").send_keys("自动测试申请试用")
 
-#点击提交之后自动截图
+# 点击提交之后自动截图
 time.sleep(1)
-qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')                #自动保存至桌面文件夹
-qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')       #自动保存至代码文件夹
+current_time = time.strftime("%Y-%m-%d-%H_%M_%S", time.localtime(time.time()))
+qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')  # 自动保存至桌面文件夹
+qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')  # 自动保存至代码文件夹
 
-time_now = str(datetime.now())
-pic_name = qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')
+#sendresultemail('提交结果截图请见附件',current_time)
+if __name__ == "__main__":
+    sendresultemail('提交结果截图请见附件',current_time)
 
-sendresultemail('提交结果截图请见附件')
-
-#if __name__ == "__main__":
-#    sendresultemail('附件是测试提交的截图, 请查收!')
-
-#time.sleep(2)   #等待3秒
-#qd.quit()   #关闭浏览器
+time.sleep(3)   #等待2秒
+qd.quit()   #关闭浏览器
