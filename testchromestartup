@@ -8,7 +8,7 @@ from email import encoders
 import tkinter.messagebox
 import time,random,smtplib,datetime
 
-def randomchoice():                                     # 随机生成数字用于随机选中下拉框内容
+def randomchoice():                                                                  # 随机生成数字用于随机选中下拉框内容
     temp = random.uniform(0,4)
     return temp
 
