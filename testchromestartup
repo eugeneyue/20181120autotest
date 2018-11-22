@@ -56,7 +56,8 @@ qd.find_element_by_id("message").send_keys("自动测试申请试用")
 
 #点击提交之后自动截图
 time.sleep(1)
-qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')
+qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')                #自动保存至桌面文件夹
+qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')       #自动保存至代码文件夹
 
 resultemail()
 
