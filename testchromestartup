@@ -8,6 +8,8 @@ from email import encoders
 import tkinter.messagebox
 import time,random,smtplib,datetime
 
+qd = webdriver.Chrome()
+
 def randomchoice():                                                                  # 随机生成数字用于随机选中下拉框内容
     temp = random.uniform(0,4)
     return temp
@@ -52,7 +54,6 @@ def sendresultemail(body='test',current_time='1995-07-20_00_00_00'):            
 
 starttime = datetime.datetime.now()                                                          # 记录开始时间
 
-qd = webdriver.Chrome()
 qd.get("http://www.gllue.com/home/product-hr")                                                # 进入谷露申请试用界面
 time.sleep(2)
 
