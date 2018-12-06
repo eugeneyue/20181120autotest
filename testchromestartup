@@ -14,7 +14,43 @@ def randomchoice():                                                             
     temp = random.uniform(0,4)
     return temp
 
-def sendresultemail(body='test',current_time='1995-07-20_00_00_00'):                 # 整合了发送邮件
+def testcase():
+    qd.get("http://www.gllue.com/home/product-hr")                                                  # 进入谷露申请试用界面
+    time.sleep(2)
+
+    # 定位申请试用按钮
+    # qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                      # 通过xpath来定位申请试用按钮
+    qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()   # 通过CSS来定位申请试用按钮
+    time.sleep(1)
+
+    # 自动填写表单
+    qd.find_element_by_id("company").send_keys("autotest")  # 定位输入框并输入关键字
+    qd.find_element_by_id("chineseName").send_keys("autotest")
+    qd.find_element_by_id("title").send_keys("autotest")
+    qd.find_element_by_id("location").send_keys("autotest")
+    qd.find_element_by_id("mobile").send_keys("18118393383")
+    qd.find_element_by_id("email").send_keys("eugene.yue@gllue.com")
+
+    # 关于选择下拉框
+    # qd.find_element_by_xpath("//*[@id='source']/option[3]").click()                               # 固定选择一个下拉值
+    tempchoice = int(randomchoice())
+    dropdownselection = qd.find_element_by_xpath("//*[@id='scale']")                                # 随机选择下拉框的value
+    Select(dropdownselection).select_by_index(tempchoice)
+
+    qd.find_element_by_id("message").send_keys("自动测试申请试用")
+
+    # qd.find_element_by_css_selector("#request > input.button").click()                             # 通过CSS定位申请试用按钮
+    # qd.find_element_by_xpath("//*[@id='request']/input[7]").click()                                # 通过xpath定位申请试用按钮
+
+    # 点击提交之后自动截图
+    time.sleep(1)
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+    qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')            # 自动保存至桌面文件夹
+    qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')  # 自动保存至代码文件夹
+
+    return str(current_time)
+
+def sendresultemail(start_time,duration,current_time):                               # 整合了邮件正文和发送邮件
     sender = 'eugene.yue@gllue.com'                                                  # 发送邮箱
     receiver = 'eugeneyueyujiang@163.com'                                            # 接收邮箱
     subject = '申请试用-自动化提交结果截图'                                              # 发送邮件主题
@@ -27,12 +63,43 @@ def sendresultemail(body='test',current_time='1995-07-20_00_00_00'):            
     msg['To'] = receiver
     msg['Subject'] = subject
 
-    msg.attach(MIMEText(body, 'html', 'utf-8'))
-
+    #current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
     pngname = current_time + '.png'                                                        # 确认截图文件名称
 
-    #pngpath = '//Users/eugene/desktop/autoscreenshot/' + pngname                          # 根据文件名定位（本地）
+    pngpath = '//Users/eugene/desktop/autoscreenshot/' + pngname                           # 根据文件名定位（本地）
     pngpath = '//Users/eugene/Autotest/20181120/Autoscreenshot/' + pngname                 # 根据文件名定位（代码文件中）
+
+    body = """
+    <div><span style="font-size:18pt;"><strong>Test Report of Leads</strong></span></div>
+    <div>&nbsp;</div>
+    <div><strong>Start Time:&nbsp;</strong>""" + str(start_time) + """</div>
+    <div><strong>Duration:&nbsp;</strong>""" + str(duration) + """</div>
+    <div><strong>Status:&nbsp;</strong></div>
+    <div>&nbsp;</div>
+    <div>
+    <table border="1" cellpadding="1" cellspacing="1" style="width:500px;">
+    	<tbody align="center" valign="center">
+    		<tr>
+    			<td><strong>Test Group/Test Case</strong></td>
+    			<td><strong>Count</strong></td>
+    			<td><strong>Pass</strong></td>
+    			<td><strong>Fail</strong></td>
+    			<td><strong>Error</strong></td>
+    		</tr>
+    		<tr>
+    			<td>&nbsp;</td>
+    			<td>&nbsp;</td>
+    			<td>&nbsp;</td>
+    			<td>&nbsp;</td>
+    			<td>&nbsp;</td>
+    		</tr>
+    	</tbody>
+    </table>
+    <div>&nbsp;</div>
+    <div><em>Generate by auto-testing and please do not reply. -- Eugene</em></div>
+    </div>
+    """
+    msg.attach(MIMEText(body, 'html', 'utf-8'))
 
     with open(pngpath, 'rb') as f:
         mime = MIMEBase('image', 'png', filename = pngname)                                 # MIMEBase表示附件的对象
@@ -52,78 +119,19 @@ def sendresultemail(body='test',current_time='1995-07-20_00_00_00'):            
     except smtplib.SMTPException as e:
         tkinter.messagebox.showinfo("邮件发送失败", "Errorinfo: %s" % e)
 
-starttime = datetime.datetime.now()                                                          # 记录开始时间
+def shutchromedown(interval=3):
+    time.sleep(interval)                                                                    # 等待3秒
+    qd.quit()                                                                               # 关闭浏览器
 
-qd.get("http://www.gllue.com/home/product-hr")                                                # 进入谷露申请试用界面
-time.sleep(2)
+if __name__ == "__main__":
+    start_time = datetime.datetime.now()  # 记录开始时间
+    current_time = testcase()
+    end_time = datetime.datetime.now()  # 记录结束时间
+    testcaseduration = end_time - start_time
+    testcaseduration = str(testcaseduration)
 
-#定位申请试用按钮
-#qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                      # 通过xpath来定位申请试用按钮
-qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()  # 通过CSS来定位申请试用按钮
-time.sleep(1)
+    print("脚本运行时长：" + str(testcaseduration))
 
-#自动填写表单
-qd.find_element_by_id("company").send_keys("autotest")                                         # 定位输入框并输入关键字
-qd.find_element_by_id("chineseName").send_keys("autotest")
-qd.find_element_by_id("title").send_keys("autotest")
-qd.find_element_by_id("location").send_keys("autotest")
-qd.find_element_by_id("mobile").send_keys("18118393383")
-qd.find_element_by_id("email").send_keys("eugene.yue@gllue.com")
+    sendresultemail(start_time,testcaseduration,current_time)
 
-#关于选择下拉框
-#qd.find_element_by_xpath("//*[@id='source']/option[3]").click()                               # 固定选择一个下拉值
-tempchoice = int(randomchoice())
-dropdownselection = qd.find_element_by_xpath("//*[@id='scale']")                               # 随机选择下拉框的value
-Select(dropdownselection).select_by_index(tempchoice)
-
-qd.find_element_by_id("message").send_keys("自动测试申请试用")
-
-#qd.find_element_by_css_selector("#request > input.button").click()                             # 通过CSS定位申请试用按钮
-#qd.find_element_by_xpath("//*[@id='request']/input[7]").click()                                # 通过xpath定位申请试用按钮
-
-# 点击提交之后自动截图
-time.sleep(1)
-current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')            # 自动保存至桌面文件夹
-qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')  # 自动保存至代码文件夹
-
-endtime = datetime.datetime.now()                                                                      # 记录结束时间
-duration = (endtime - starttime)
-print("脚本运行时长：" + str(duration))
-
-emailcontent = """
-<div><span style="font-size:18pt;"><strong>Test Report of Leads</strong></span></div>
-<div>&nbsp;</div>
-<div><strong>Start Time:&nbsp;</strong>""" + str(current_time) + """</div>
-<div><strong>Duration:&nbsp;</strong>""" + str(duration) + """</div>
-<div><strong>Status:&nbsp;</strong></div>
-<div>&nbsp;</div>
-<div>
-<table border="1" cellpadding="1" cellspacing="1" style="width:500px;">
-	<tbody align="center" valign="center">
-		<tr>
-			<td><strong>Test Group/Test Case</strong></td>
-			<td><strong>Count</strong></td>
-			<td><strong>Pass</strong></td>
-			<td><strong>Fail</strong></td>
-			<td><strong>Error</strong></td>
-		</tr>
-		<tr>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
-		</tr>
-	</tbody>
-</table>
-<div>&nbsp;</div>
-<div><em>Generate by auto-testing and please do not reply. -- Eugene</em></div>
-</div>
-"""
-
-if __name__ == "__main__":                                                          # 发送测试结果邮件
-    sendresultemail(emailcontent,current_time)
-
-time.sleep(3)   #等待2秒
-qd.quit()   #关闭浏览器
+    shutchromedown(interval=3)
