@@ -1,8 +1,26 @@
 --------------------分割线----------------------
 
+2018-12-07
+
+添加断言：判断点击申请试用按钮之后页面的提醒文字 - 基于status来发送邮件，只有失败的时候才会触发邮件
+
+⭐️(O_O)? 通过randomchoice函数自动生成数字后，设置了等待一秒钟：不知道是不是因为机器生成随机数字需要时间，导致数字没有来的及传递？
+
+--------------------分割线----------------------
+
 2018-12-06
 
-尝试把“测试邮件内容”单独拎出来作为一个函数，将此函数返回的邮件正文传入“发送邮件”的函数中：但是一直报错TypeError: 'str' object is not callable；怀疑是因为邮件内容传输过程中的编码问题导致？
+⭐️(O_O)? 尝试把“测试邮件内容”单独拎出来作为一个函数，将此函数返回的邮件正文传入“发送邮件”的函数中：但是一直报错TypeError: 'str' object is not callable；怀疑是因为邮件内容传输过程中的编码问题导致？
+
+提交申请试用成功的提示：
+
+xpath:
+/html/body/div/div/div/div[2]/div/div/text()
+
+selector:
+body > div > div > div > div.request-form > div > div
+
+error_message = qd.find_element_by_xpath("/html/body/div/div/div/div[2]/div/div").text
 
 --------------------分割线----------------------
 
