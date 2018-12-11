@@ -4,7 +4,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-from pyvirtualdisplay import Display
 
 import tkinter.messagebox
 import time,random,smtplib,datetime
@@ -13,6 +12,7 @@ import time,random,smtplib,datetime
 
 back_end = webdriver.ChromeOptions()
 back_end.add_argument('--headless')
+back_end.add_argument('--window-size=2388,1466')                                                    # 设置背景运行屏幕大小
 qd = webdriver.Chrome(chrome_options=back_end)
 
 #qd = webdriver.Chrome()
