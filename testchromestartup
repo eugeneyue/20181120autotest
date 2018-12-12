@@ -4,6 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import zlib
 
 import tkinter.messagebox
 import time,random,smtplib,datetime
@@ -26,8 +27,8 @@ def testcase():
     time.sleep(2)
 
     # 定位申请试用按钮
-    # qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                      # 通过xpath来定位申请试用按钮
-    qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()   # 通过CSS来定位申请试用按钮
+    # qd.find_element_by_xpath("/html/body/div/div/section/div/a[1]").click()                       # 通过xpath来定位申请试用按钮
+    qd.find_element_by_css_selector("body > div > div > section > div > a:nth-child(1)").click()    # 通过CSS来定位申请试用按钮
     time.sleep(1)
 
     # 自动填写表单
@@ -42,8 +43,8 @@ def testcase():
     # qd.find_element_by_xpath("//*[@id='source']/option[3]").click()                               # 固定选择一个下拉值
     tempchoice = int(random.uniform(0,4))                                                           # 随机选择一个下拉值
     time.sleep(1)                                                                                   # 通过randomchoice函数自动生成数字后，设置了等待一秒钟：不知道是不是因为机器生成随机数字需要时间，导致数字没有来的及传递？
-    dropdownselection1 = qd.find_element_by_xpath("//*[@id='scale']")                               # 随机选择下拉框的value:团队规模
-    Select(dropdownselection1).select_by_index(tempchoice)
+    #dropdownselection1 = qd.find_element_by_xpath("//*[@id='scale']")                               # 随机选择下拉框的value:团队规模
+    #Select(dropdownselection1).select_by_index(tempchoice)
     dropdownselection2 = qd.find_element_by_xpath("//*[@id='source']")                              # 随机选择下拉框的value:您是如何得知谷露的
     Select(dropdownselection2).select_by_index(tempchoice)
 
