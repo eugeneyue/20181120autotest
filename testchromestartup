@@ -4,7 +4,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-import zlib
 
 import tkinter.messagebox
 import time,random,smtplib,datetime
@@ -43,7 +42,7 @@ def testcase():
     # qd.find_element_by_xpath("//*[@id='source']/option[3]").click()                               # 固定选择一个下拉值
     tempchoice = int(random.uniform(0,4))                                                           # 随机选择一个下拉值
     time.sleep(1)                                                                                   # 通过randomchoice函数自动生成数字后，设置了等待一秒钟：不知道是不是因为机器生成随机数字需要时间，导致数字没有来的及传递？
-    #dropdownselection1 = qd.find_element_by_xpath("//*[@id='scale']")                               # 随机选择下拉框的value:团队规模
+    #dropdownselection1 = qd.find_element_by_xpath("//*[@id='scale']")                              # 随机选择下拉框的value:团队规模
     #Select(dropdownselection1).select_by_index(tempchoice)
     dropdownselection2 = qd.find_element_by_xpath("//*[@id='source']")                              # 随机选择下拉框的value:您是如何得知谷露的
     Select(dropdownselection2).select_by_index(tempchoice)
@@ -59,14 +58,26 @@ def testcase():
     qd.get_screenshot_as_file('//Users/eugene/desktop/autoscreenshot/' + current_time + '.png')            # 自动保存至桌面文件夹
     qd.get_screenshot_as_file('//Users/eugene/Autotest/20181120/Autoscreenshot/' + current_time + '.png')  # 自动保存至代码文件夹
 
+    success_message = qd.find_element_by_xpath("/html/body/div/div/div/div[2]/div/div").text               # 执行成功的提示
+    required_message = qd.find_element_by_xpath("//*[@id='request']/div").text                             # 必填的提示
+    #alert = qd.switch_to.alert()
+
     try:                                                                                                   #判断测试是否通过
-        success_message = qd.find_element_by_xpath("/html/body/div/div/div/div[2]/div/div").text
         assert success_message == "您的信息已成功提交！我们将尽快与您联系！"
         teststatus = 'Pass!'
         print("执行结果：Pass！")
     except Exception as e:
-        teststatus = 'Failed!'
-        print("执行结果：Failed！", format(e))
+        if required_message:
+            teststatus = 'Failed!'
+            print("执行结果：Failed；失败原因：没有填写所有表单", format(e))
+        # elif alert:
+        #     alert_text = alert.text
+        #     alert.accept()
+        #     teststatus = 'Failed!'
+        #     print("执行结果：Failed；失败原因：" + alert_text, format(e))
+        else:
+            teststatus = 'Failed!'
+            print("执行结果：Failed；失败原因：请查看截图", format(e))
 
     return str(current_time),teststatus
 
